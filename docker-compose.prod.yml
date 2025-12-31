@@ -10,7 +10,11 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - backend_media:/app/media
+      - backend_static:/app/staticfiles
+      - backend_db:/app/db
     restart: unless-stopped
 
 volumes:
   backend_media:
+  backend_static:
+  backend_db:
