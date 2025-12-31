@@ -1,15 +1,3 @@
-// import { api } from "../lib/api";
-// import type { Project } from "../types/project";
-
-// export const getProjects = async (): Promise<Project[]> => {
-//   const res = await api.get("/projects/");
-//   return res.data;
-// };
-
-
-
-
-
 
 import { api } from "../lib/api";
 import type { Project } from "../types/project";

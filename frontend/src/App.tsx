@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "./lib/api";
 import CompaniesPage from "./pages/CompaniesPage";
 import ProjectsPage from "./pages/ProjectsPage";
@@ -11,7 +11,12 @@ type Page = "companies" | "projects" | "documents" | "versions" | "auditLogs";
 function App() {
   const [username, setUsername] = useState("doccontrol");
   const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = sessionStorage.getItem("access_token");
+    return !!token;
+  });
+  const [rememberSession, setRememberSession] = useState(true);
+
   const [error, setError] = useState("");
   const [page, setPage] = useState<Page>("companies");
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
@@ -22,17 +27,32 @@ function App() {
   );
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  useEffect(() => {
+  const token = sessionStorage.getItem("access_token");
+  if (token) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
+}, []);
+
+
   const login = async () => {
     setError("");
     try {
-      const res = await api.post("/token/", { username, password });
-      const access = res.data.access;
-      api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
-      setIsAuthenticated(true);
+        const res = await api.post("/token/", { username, password });
+        const access = res.data.access;
+
+        api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+
+        if (rememberSession) {
+        sessionStorage.setItem("access_token", access);
+        }
+
+        setIsAuthenticated(true);
     } catch {
-      setError("Login failed");
+        setError("Login failed");
     }
-  };
+    };
+
 
   /* =======================
      LOGIN SCREEN
@@ -62,6 +82,19 @@ function App() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
             />
+
+
+            <label className="flex items-center gap-2 text-sm text-slate-600">
+                <input
+                    type="checkbox"
+                    checked={rememberSession}
+                    onChange={(e) => setRememberSession(e.target.checked)}
+                />
+                Stay logged in for this session
+            </label>
+
+
+
 
             <button
               onClick={login}

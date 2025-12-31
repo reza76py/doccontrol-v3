@@ -1,39 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { getDocuments } from "../api/documents";
-// import type { Document } from "../types/document";
-
-// export default function DocumentsPage() {
-//   const [documents, setDocuments] = useState<Document[]>([]);
-
-//   useEffect(() => {
-//     getDocuments().then(setDocuments);
-//   }, []);
-
-//   return (
-//     <div>
-//       <h2>Documents</h2>
-
-//       <ul>
-//         {documents.map((d) => (
-//           <li key={d.id}>
-//             <strong>{d.document_number}</strong> — {d.title}
-//             <br />
-//             Status: {d.status} | Discipline: {d.discipline}
-//             <br />
-//             Created by: {d.created_by_username}
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
 
 import { useEffect, useState } from "react";
 import { getDocuments } from "../api/documents";
