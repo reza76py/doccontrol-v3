@@ -122,7 +122,7 @@ function App() {
             <img
               src={logo}
               alt="RezTeche Logo"
-              className="h-10 md:h-11 w-auto object-contain"
+              className="h-28 w-auto object-contain transition-all duration-200"
             />
           </a>
 
