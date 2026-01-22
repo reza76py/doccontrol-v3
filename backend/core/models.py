@@ -97,7 +97,7 @@ class Document(models.Model):
 class DocumentVersion(models.Model):
     document = models.ForeignKey(
         Document,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="versions",
     )
     version_number = models.PositiveIntegerField()
@@ -134,6 +134,7 @@ class AuditLog(models.Model):
         ("UPDATE", "Update"),
         ("ISSUE", "Issue"),
         ("CANCEL", "Cancel"),
+        ("DELETE", "Delete"),
     ]
 
     entity_type = models.CharField(max_length=20, choices=ENTITY_CHOICES)

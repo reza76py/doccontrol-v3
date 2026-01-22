@@ -9,3 +9,8 @@ export const getDocuments = async (
   });
   return res.data;
 };
+
+
+export const deleteDocument = async (id: number) => {
+  await api.delete(`/documents/${id}/`);
+};

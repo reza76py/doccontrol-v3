@@ -36,6 +36,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class DocumentVersionSerializer(serializers.ModelSerializer):
     uploaded_by_username = serializers.CharField(source="uploaded_by.username", read_only=True)
+    file = serializers.SerializerMethodField()
 
     class Meta:
         model = DocumentVersion
@@ -57,10 +58,18 @@ class DocumentVersionSerializer(serializers.ModelSerializer):
             "uploaded_at",
         ]
 
+    def get_file(self, obj):
+        if not obj.file:
+            return None
+        request = self.context.get("request")
+        url = obj.file.url  # should be /media/documents/....
+        return request.build_absolute_uri(url) if request else url
+
 
 class DocumentSerializer(serializers.ModelSerializer):
     created_by_username = serializers.CharField(source="created_by.username", read_only=True)
     latest_version = serializers.SerializerMethodField()
+    versions_count = serializers.IntegerField(read_only=True)  # ✅ REQUIRED
 
     class Meta:
         model = Document
@@ -76,20 +85,33 @@ class DocumentSerializer(serializers.ModelSerializer):
             "created_by_username",
             "created_at",
             "latest_version",
+            "versions_count",
         ]
-        read_only_fields = ["id", "created_by", "created_by_username", "created_at", "latest_version"]
+        read_only_fields = [
+            "id",
+            "created_by",
+            "created_by_username",
+            "created_at",
+            "latest_version",
+            "versions_count",
+        ]
 
     def get_latest_version(self, obj):
         v = obj.versions.order_by("-version_number").first()
         if not v:
             return None
+
+        request = self.context.get("request")
+        file_url = v.file.url if v.file else None
+        if file_url and request:
+            file_url = request.build_absolute_uri(file_url)
+
         return {
             "id": v.id,
             "version_number": v.version_number,
-            "file": v.file.url if v.file else None,
+            "file": file_url,
             "uploaded_at": v.uploaded_at,
         }
-
 
 class AuditLogSerializer(serializers.ModelSerializer):
     performed_by_username = serializers.CharField(source="performed_by.username", read_only=True)

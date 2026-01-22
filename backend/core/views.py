@@ -2,8 +2,10 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
 from django.db import transaction
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 
 from .models import (
@@ -48,6 +50,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     queryset = (
         Document.objects
         .select_related("project", "created_by")
+        .annotate(versions_count=Count("versions", distinct=True))
         .prefetch_related("versions")
     )
     serializer_class = DocumentSerializer
@@ -67,6 +70,29 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 "status": document.status,
             },
         )
+
+    def destroy(self, request, *args, **kwargs):
+        document = self.get_object()
+
+        # ✅ Hard rule: cannot delete if any versions exist
+        if document.versions.exists():
+            return Response({"detail": "Cannot delete a document that has versions."}, status=status.HTTP_409_CONFLICT)
+
+        # ✅ Audit BEFORE delete (so we still have the fields)
+        AuditLog.objects.create(
+            entity_type="DOCUMENT",
+            entity_id=document.id,
+            action="DELETE",
+            performed_by=request.user,
+            old_value={
+                "document_number": document.document_number,
+                "title": document.title,
+                "status": document.status,
+                "project": document.project_id,
+            },
+        )
+
+        return super().destroy(request, *args, **kwargs)
 
     # =========================
     # CUSTOM ACTION: UPLOAD VERSION
@@ -116,7 +142,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         )
 
         return Response(
-            DocumentVersionSerializer(version).data,
+            DocumentVersionSerializer(version, context={"request": request}).data,
             status=status.HTTP_201_CREATED,
         )
 

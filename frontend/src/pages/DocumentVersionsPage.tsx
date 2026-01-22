@@ -20,7 +20,10 @@ export default function DocumentVersionsPage() {
             <br />
             Uploaded by: {v.uploaded_by_username}
             <br />
-            File: <a href={v.file} target="_blank">download</a>
+            File:{" "}
+            <a href={v.file} target="_blank" rel="noreferrer">
+              Download {v.file?.split("/").pop()}
+            </a>
           </li>
         ))}
       </ul>

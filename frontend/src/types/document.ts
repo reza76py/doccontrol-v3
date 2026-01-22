@@ -9,4 +9,5 @@ export interface Document {
   created_by: number;
   created_by_username: string;
   created_at: string;
+  versions_count: number;
 }
