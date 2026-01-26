@@ -1,8 +1,18 @@
 
 from django.db import models
 from django.contrib.auth import get_user_model
+import os
 
 User = get_user_model()
+
+
+def document_upload_path(instance, filename):
+    """Generate file path for document uploads."""
+    return os.path.join(
+        f"projects/{instance.document.project.id}",
+        f"documents/{instance.document.id}",
+        filename
+    )
 
 
 # =========================
@@ -95,19 +105,11 @@ class Document(models.Model):
 # DOCUMENT VERSION
 # =========================
 class DocumentVersion(models.Model):
-    document = models.ForeignKey(
-        Document,
-        on_delete=models.PROTECT,
-        related_name="versions",
-    )
+    document = models.ForeignKey(Document, on_delete=models.PROTECT, related_name="versions")
     version_number = models.PositiveIntegerField()
-    file = models.FileField(upload_to="documents/")
+    file = models.FileField(upload_to=document_upload_path)
     change_note = models.TextField(blank=True)
-    uploaded_by = models.ForeignKey(
-        User,
-        on_delete=models.PROTECT,
-        related_name="uploaded_versions",
-    )
+    uploaded_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="uploaded_versions")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -116,6 +118,7 @@ class DocumentVersion(models.Model):
 
     def __str__(self):
         return f"{self.document.document_number} v{self.version_number}"
+
 
 
 # =========================
