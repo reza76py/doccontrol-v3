@@ -39,6 +39,9 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
   const [documents, setDocuments] = useState<Document[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
 
   // Create form
   const [showCreate, setShowCreate] = useState(false);
@@ -53,19 +56,25 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
   // Delete
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [projectId]);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await getDocuments(projectId);
-      setDocuments(data);
+      const data = await getDocuments(projectId, currentPage);
+      setDocuments(data.results);
+      setTotalCount(data.count);
+      setHasNext(data.next !== null);
     } catch {
       setError("Failed to load documents.");
       setDocuments([]);
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, currentPage]);
 
   useEffect(() => {
     load();
@@ -341,6 +350,32 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
           </tbody>
         </table>
       </div>
+      )}
+
+      {!loading && totalCount > 0 && (
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <button
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1.5 rounded-md border border-slate-300 font-medium
+                       text-slate-700 hover:bg-slate-100 transition
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span className="text-slate-500">
+            Page {currentPage} of {Math.ceil(totalCount / 20)}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={!hasNext}
+            className="px-3 py-1.5 rounded-md border border-slate-300 font-medium
+                       text-slate-700 hover:bg-slate-100 transition
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );

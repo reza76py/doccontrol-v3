@@ -1,11 +1,19 @@
 import { api } from "../lib/api";
 import type { Document } from "../types/document";
 
+export type PaginatedResponse<T> = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+};
+
 export const getDocuments = async (
-  projectId?: number
-): Promise<Document[]> => {
+  projectId?: number,
+  page = 1
+): Promise<PaginatedResponse<Document>> => {
   const res = await api.get("/documents/", {
-    params: projectId ? { project: projectId } : {},
+    params: { ...(projectId ? { project: projectId } : {}), page },
   });
   return res.data;
 };

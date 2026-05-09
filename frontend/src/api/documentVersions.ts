@@ -1,9 +1,13 @@
 import { api } from "../lib/api";
 import type { DocumentVersion } from "../types/documentVersion";
+import type { PaginatedResponse } from "./documents";
 
-export const getDocumentVersions = async (documentId: number): Promise<DocumentVersion[]> => {
+export const getDocumentVersions = async (
+  documentId: number,
+  page = 1
+): Promise<PaginatedResponse<DocumentVersion>> => {
   const res = await api.get("/document-versions/", {
-    params: { document: documentId },
+    params: { document: documentId, page },
   });
   return res.data;
 };

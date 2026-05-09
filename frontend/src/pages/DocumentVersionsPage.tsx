@@ -10,6 +10,9 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
   const [versions, setVersions] = useState<DocumentVersion[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
 
   // Upload form
   const [showUpload, setShowUpload] = useState(false);
@@ -18,19 +21,25 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [documentId]);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await getDocumentVersions(documentId);
-      setVersions(data);
+      const data = await getDocumentVersions(documentId, currentPage);
+      setVersions(data.results);
+      setTotalCount(data.count);
+      setHasNext(data.next !== null);
     } catch {
       setError("Failed to load versions.");
       setVersions([]);
     } finally {
       setLoading(false);
     }
-  }, [documentId]);
+  }, [documentId, currentPage]);
 
   useEffect(() => {
     load();
@@ -217,6 +226,32 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
           </tbody>
         </table>
       </div>
+      )}
+
+      {!loading && totalCount > 0 && (
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <button
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1.5 rounded-md border border-slate-300 font-medium
+                       text-slate-700 hover:bg-slate-100 transition
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span className="text-slate-500">
+            Page {currentPage} of {Math.ceil(totalCount / 20)}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={!hasNext}
+            className="px-3 py-1.5 rounded-md border border-slate-300 font-medium
+                       text-slate-700 hover:bg-slate-100 transition
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );

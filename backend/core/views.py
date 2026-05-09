@@ -11,6 +11,7 @@ from django.utils.encoding import force_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from rest_framework import viewsets, status
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
@@ -36,6 +37,10 @@ from .serializers import (
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
+
+class StandardPagination(PageNumberPagination):
+    page_size = 20
 
 
 # =========================
@@ -189,6 +194,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     )
     serializer_class = DocumentSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
 
     def perform_create(self, serializer):
         document = serializer.save(created_by=self.request.user)
@@ -282,6 +288,7 @@ class DocumentVersionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DocumentVersion.objects.select_related("document", "uploaded_by")
     serializer_class = DocumentVersionSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
 
 
 # =========================
