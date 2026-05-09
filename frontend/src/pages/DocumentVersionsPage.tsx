@@ -9,6 +9,7 @@ type DocumentVersionsPageProps = {
 export default function DocumentVersionsPage({ documentId }: DocumentVersionsPageProps) {
   const [versions, setVersions] = useState<DocumentVersion[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Upload form
   const [showUpload, setShowUpload] = useState(false);
@@ -18,6 +19,7 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
     setError("");
     try {
       const data = await getDocumentVersions(documentId);
@@ -25,6 +27,8 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
     } catch {
       setError("Failed to load versions.");
       setVersions([]);
+    } finally {
+      setLoading(false);
     }
   }, [documentId]);
 
@@ -137,6 +141,32 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
         </form>
       )}
 
+      {loading ? (
+        <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white animate-pulse">
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-100 text-slate-600">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium">Version</th>
+                <th className="px-4 py-3 text-left font-medium">File</th>
+                <th className="px-4 py-3 text-left font-medium">Change Note</th>
+                <th className="px-4 py-3 text-left font-medium">Uploaded By</th>
+                <th className="px-4 py-3 text-left font-medium">Date</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {[1, 2, 3].map((n) => (
+                <tr key={n}>
+                  <td className="px-4 py-3"><div className="h-4 w-8 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-40 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-32 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
       <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
         <table className="min-w-full text-sm">
           <thead className="bg-slate-100 text-slate-600">
@@ -187,6 +217,7 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }

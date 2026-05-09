@@ -38,6 +38,7 @@ const statusStyle: Record<string, string> = {
 export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPageProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Create form
   const [showCreate, setShowCreate] = useState(false);
@@ -53,6 +54,7 @@ export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPag
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
     setError("");
     try {
       const data = await getProjects(companyId);
@@ -60,6 +62,8 @@ export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPag
     } catch {
       setError("Failed to load projects.");
       setProjects([]);
+    } finally {
+      setLoading(false);
     }
   }, [companyId]);
 
@@ -183,6 +187,23 @@ export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPag
         </form>
       )}
 
+      {loading ? (
+        <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg bg-white animate-pulse">
+          {[1, 2, 3].map((n) => (
+            <li key={n} className="px-4 py-3 flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="h-4 w-24 bg-slate-200 rounded" />
+                <div className="h-3 w-40 bg-slate-200 rounded" />
+              </div>
+              <div className="flex gap-2">
+                <div className="h-8 w-20 bg-slate-200 rounded-md" />
+                <div className="h-8 w-12 bg-slate-200 rounded-md" />
+                <div className="h-8 w-16 bg-slate-200 rounded-md" />
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
       <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg bg-white">
         {projects.map((p) => {
           const isEditing = editingId === p.id;
@@ -272,6 +293,7 @@ export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPag
           </li>
         )}
       </ul>
+      )}
     </div>
   );
 }

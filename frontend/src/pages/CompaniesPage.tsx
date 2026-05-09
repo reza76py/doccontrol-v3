@@ -10,6 +10,7 @@ type CompaniesPageProps = {
 export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Create form
   const [showCreate, setShowCreate] = useState(false);
@@ -25,9 +26,11 @@ export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     getCompanies()
       .then(setCompanies)
-      .catch(() => setError("Failed to load companies."));
+      .catch(() => setError("Failed to load companies."))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -143,6 +146,16 @@ export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
         </form>
       )}
 
+      {loading ? (
+        <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg bg-white animate-pulse">
+          {[1, 2, 3].map((n) => (
+            <li key={n} className="px-4 py-3 flex items-center justify-between">
+              <div className="h-4 w-40 bg-slate-200 rounded" />
+              <div className="h-8 w-24 bg-slate-200 rounded-md" />
+            </li>
+          ))}
+        </ul>
+      ) : (
       <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg bg-white">
         {companies.map((c) => {
           const isEditing = editingId === c.id;
@@ -224,6 +237,7 @@ export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
           </li>
         )}
       </ul>
+      )}
     </div>
   );
 }

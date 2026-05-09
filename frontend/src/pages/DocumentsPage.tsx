@@ -38,6 +38,7 @@ const statusStyle: Record<string, string> = {
 export default function DocumentsPage({ projectId, onSelectDocument }: DocumentsPageProps) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Create form
   const [showCreate, setShowCreate] = useState(false);
@@ -53,6 +54,7 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
     setError("");
     try {
       const data = await getDocuments(projectId);
@@ -60,6 +62,8 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
     } catch {
       setError("Failed to load documents.");
       setDocuments([]);
+    } finally {
+      setLoading(false);
     }
   }, [projectId]);
 
@@ -190,6 +194,36 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
         </form>
       )}
 
+      {loading ? (
+        <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white animate-pulse">
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-100 text-slate-600">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium">Document No.</th>
+                <th className="px-4 py-3 text-left font-medium">Title</th>
+                <th className="px-4 py-3 text-left font-medium">Discipline</th>
+                <th className="px-4 py-3 text-left font-medium">Type</th>
+                <th className="px-4 py-3 text-left font-medium">Status</th>
+                <th className="px-4 py-3 text-left font-medium">Created By</th>
+                <th className="px-4 py-3 text-right font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {[1, 2, 3].map((n) => (
+                <tr key={n}>
+                  <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-36 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-5 w-16 bg-slate-200 rounded-full" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3 text-right"><div className="h-7 w-20 bg-slate-200 rounded-md ml-auto" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
       <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
         <table className="min-w-full text-sm">
           <thead className="bg-slate-100 text-slate-600">
@@ -307,6 +341,7 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }

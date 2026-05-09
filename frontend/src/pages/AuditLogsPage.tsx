@@ -23,13 +23,16 @@ const entityStyle: Record<string, string> = {
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
   const [filterAction, setFilterAction] = useState("");
   const [filterEntity, setFilterEntity] = useState("");
 
   useEffect(() => {
+    setLoading(true);
     getAuditLogs()
       .then(setLogs)
-      .catch(() => setError("Failed to load audit logs."));
+      .catch(() => setError("Failed to load audit logs."))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = logs.filter(
@@ -98,6 +101,32 @@ export default function AuditLogsPage() {
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
+      {loading ? (
+        <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white animate-pulse">
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-100 text-slate-600">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium">Date</th>
+                <th className="px-4 py-3 text-left font-medium">User</th>
+                <th className="px-4 py-3 text-left font-medium">Action</th>
+                <th className="px-4 py-3 text-left font-medium">Entity Type</th>
+                <th className="px-4 py-3 text-left font-medium">Entity ID</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {[1, 2, 3].map((n) => (
+                <tr key={n}>
+                  <td className="px-4 py-3"><div className="h-4 w-32 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
+                  <td className="px-4 py-3"><div className="h-5 w-16 bg-slate-200 rounded-full" /></td>
+                  <td className="px-4 py-3"><div className="h-5 w-20 bg-slate-200 rounded-full" /></td>
+                  <td className="px-4 py-3"><div className="h-4 w-8 bg-slate-200 rounded" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
       <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
         <table className="min-w-full text-sm">
           <thead className="bg-slate-100 text-slate-600">
@@ -149,6 +178,7 @@ export default function AuditLogsPage() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }
