@@ -15,14 +15,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import Company, Project, Document, DocumentVersion, AuditLog
+from .models import Company, Project, Document, DocumentVersion, AuditLog, UserProfile
 from .serializers import (
     CompanySerializer,
     ProjectSerializer,
@@ -37,6 +37,42 @@ from .serializers import (
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
+
+def get_user_role(user):
+    try:
+        return user.profile.role
+    except UserProfile.DoesNotExist:
+        return "VIEWER"
+
+
+class RolePermission(BasePermission):
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        role = get_user_role(request.user)
+
+        if role == "ADMIN":
+            return True
+
+        if request.method in SAFE_METHODS:
+            return True
+
+        action = getattr(view, "action", None)
+
+        if role == "PROJECT_MANAGER":
+            return action != "destroy"
+
+        if role == "ENGINEER":
+            if action == "create" and view.__class__.__name__ == "DocumentViewSet":
+                return True
+            if action == "upload_version":
+                return True
+            return False
+
+        # VIEWER
+        return False
 
 
 class StandardPagination(PageNumberPagination):
@@ -170,7 +206,7 @@ class PasswordResetConfirmView(APIView):
 class CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [RolePermission]
 
 
 # =========================
@@ -179,7 +215,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.select_related("company")
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [RolePermission]
 
 
 # =========================
@@ -193,7 +229,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         .prefetch_related("versions")
     )
     serializer_class = DocumentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [RolePermission]
     pagination_class = StandardPagination
 
     def perform_create(self, serializer):
@@ -287,7 +323,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 class DocumentVersionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DocumentVersion.objects.select_related("document", "uploaded_by")
     serializer_class = DocumentVersionSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [RolePermission]
     pagination_class = StandardPagination
 
 

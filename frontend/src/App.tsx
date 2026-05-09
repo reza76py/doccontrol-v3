@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -19,6 +19,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import logo from "./assets/rezteche-logo.png";
+import { authApi } from "./lib/api";
 
 type Page = "companies" | "projects" | "documents" | "versions" | "auditLogs";
 
@@ -37,6 +38,13 @@ function MainApp() {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [role, setRole] = useState("VIEWER");
+
+  useEffect(() => {
+    authApi.profile()
+      .then((res) => setRole(res.data.role ?? "VIEWER"))
+      .catch(() => setRole("VIEWER"));
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -152,6 +160,7 @@ function MainApp() {
               setSelectedCompanyId(id);
               setPage("projects");
             }}
+            role={role}
           />
         )}
 
@@ -162,6 +171,7 @@ function MainApp() {
               setSelectedProjectId(projectId);
               setPage("documents");
             }}
+            role={role}
           />
         )}
 
@@ -172,11 +182,12 @@ function MainApp() {
               setSelectedDocumentId(id);
               setPage("versions");
             }}
+            role={role}
           />
         )}
 
         {page === "versions" && selectedDocumentId !== null && (
-          <DocumentVersionsPage documentId={selectedDocumentId} />
+          <DocumentVersionsPage documentId={selectedDocumentId} role={role} />
         )}
         {page === "auditLogs" && <AuditLogsPage />}
       </main>

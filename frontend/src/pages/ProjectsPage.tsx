@@ -5,6 +5,7 @@ import type { Project } from "../types/project";
 type ProjectsPageProps = {
   companyId?: number;
   onSelectProject: (projectId: number) => void;
+  role: string;
 };
 
 type FormState = {
@@ -35,7 +36,10 @@ const statusStyle: Record<string, string> = {
   CLOSED:    "bg-slate-200 text-slate-600",
 };
 
-export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPageProps) {
+export default function ProjectsPage({ companyId, onSelectProject, role = "VIEWER" }: ProjectsPageProps) {
+  const canCreate = role === "ADMIN" || role === "PROJECT_MANAGER";
+  const canEdit   = role === "ADMIN" || role === "PROJECT_MANAGER";
+  const canDelete = role === "ADMIN";
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -146,7 +150,7 @@ export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPag
           <h2 className="text-2xl font-semibold text-slate-800">Projects</h2>
           <p className="text-sm text-slate-500">List of active and closed projects</p>
         </div>
-        {!showCreate && (
+        {canCreate && !showCreate && (
           <button
             onClick={() => { setShowCreate(true); setError(""); }}
             className="text-sm font-medium text-white bg-slate-800 hover:bg-slate-700
@@ -262,24 +266,28 @@ export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPag
                     >
                       View Documents
                     </button>
-                    <button
-                      onClick={() => startEdit(p)}
-                      className="text-sm font-medium text-slate-700 hover:text-slate-900
-                                 border border-slate-300 px-3 py-1 rounded-md
-                                 hover:bg-slate-100 transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(p)}
-                      disabled={isDeleting}
-                      className={`text-sm font-medium px-3 py-1 rounded-md transition
-                        ${isDeleting
-                          ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                          : "bg-red-600 text-white hover:bg-red-700"}`}
-                    >
-                      {isDeleting ? "Deleting..." : "Delete"}
-                    </button>
+                    {canEdit && (
+                      <button
+                        onClick={() => startEdit(p)}
+                        className="text-sm font-medium text-slate-700 hover:text-slate-900
+                                   border border-slate-300 px-3 py-1 rounded-md
+                                   hover:bg-slate-100 transition"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDelete(p)}
+                        disabled={isDeleting}
+                        className={`text-sm font-medium px-3 py-1 rounded-md transition
+                          ${isDeleting
+                            ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                            : "bg-red-600 text-white hover:bg-red-700"}`}
+                      >
+                        {isDeleting ? "Deleting..." : "Delete"}
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

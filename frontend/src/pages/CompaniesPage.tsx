@@ -5,9 +5,13 @@ import type { Company } from "../types/company";
 
 type CompaniesPageProps = {
   onSelectCompany: (companyId: number) => void;
+  role: string;
 };
 
-export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
+export default function CompaniesPage({ onSelectCompany, role }: CompaniesPageProps) {
+  const canCreate = role === "ADMIN" || role === "PROJECT_MANAGER";
+  const canEdit   = role === "ADMIN" || role === "PROJECT_MANAGER";
+  const canDelete = role === "ADMIN";
   const [companies, setCompanies] = useState<Company[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -100,7 +104,7 @@ export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
           <h2 className="text-2xl font-semibold text-slate-800">Companies</h2>
           <p className="text-sm text-slate-500">Select a company to view its projects</p>
         </div>
-        {!showCreate && (
+        {canCreate && !showCreate && (
           <button
             onClick={() => { setShowCreate(true); setError(""); }}
             className="text-sm font-medium text-white bg-slate-800 hover:bg-slate-700
@@ -207,6 +211,7 @@ export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
                   >
                     View Projects
                   </button>
+                  {canEdit && (
                   <button
                     onClick={() => startEdit(c)}
                     className="text-sm font-medium text-slate-700 hover:text-slate-900
@@ -215,6 +220,8 @@ export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
                   >
                     Edit
                   </button>
+                  )}
+                  {canDelete && (
                   <button
                     onClick={() => handleDelete(c)}
                     disabled={isDeleting}
@@ -225,6 +232,7 @@ export default function CompaniesPage({ onSelectCompany }: CompaniesPageProps) {
                   >
                     {isDeleting ? "Deleting..." : "Delete"}
                   </button>
+                  )}
                 </div>
               )}
             </li>

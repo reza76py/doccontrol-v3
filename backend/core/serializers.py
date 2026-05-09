@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode
 
 from rest_framework import serializers
 
-from .models import Company, Project, Document, DocumentVersion, AuditLog
+from .models import Company, Project, Document, DocumentVersion, AuditLog, UserProfile
 
 User = get_user_model()
 
@@ -223,11 +223,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return obj.get_full_name() or obj.username
 
     def get_role(self, obj):
-        if obj.is_superuser:
-            return "Super Admin"
-        if obj.is_staff:
-            return "Staff"
-        return "User"
+        try:
+            return obj.profile.role
+        except UserProfile.DoesNotExist:
+            return "VIEWER"
 
 
 # =========================

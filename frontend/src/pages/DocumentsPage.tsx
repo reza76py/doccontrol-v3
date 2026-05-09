@@ -5,6 +5,7 @@ import type { Document } from "../types/document";
 type DocumentsPageProps = {
   projectId?: number;
   onSelectDocument?: (documentId: number) => void;
+  role?: string;
 };
 
 type FormState = {
@@ -35,7 +36,10 @@ const statusStyle: Record<string, string> = {
   CANCELLED: "bg-red-100 text-red-500",
 };
 
-export default function DocumentsPage({ projectId, onSelectDocument }: DocumentsPageProps) {
+export default function DocumentsPage({ projectId, onSelectDocument, role = "VIEWER" }: DocumentsPageProps) {
+  const canCreate = role === "ADMIN" || role === "PROJECT_MANAGER" || role === "ENGINEER";
+  const canEdit   = role === "ADMIN" || role === "PROJECT_MANAGER";
+  const canDelete = role === "ADMIN";
   const [documents, setDocuments] = useState<Document[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -162,7 +166,7 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
             <p className="text-sm text-slate-500">Project ID: {projectId}</p>
           )}
         </div>
-        {!showCreate && (
+        {canCreate && !showCreate && (
           <button
             onClick={() => { setShowCreate(true); setError(""); }}
             className="text-sm font-medium text-white bg-slate-800 hover:bg-slate-700
@@ -310,17 +314,19 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
                               View Versions
                             </button>
                           )}
-                          <button
-                            onClick={() => startEdit(d)}
-                            className="text-sm font-medium text-slate-700 hover:text-slate-900
-                                       border border-slate-300 px-3 py-1 rounded-md
-                                       hover:bg-slate-100 transition"
-                          >
-                            Edit
-                          </button>
+                          {canEdit && (
+                            <button
+                              onClick={() => startEdit(d)}
+                              className="text-sm font-medium text-slate-700 hover:text-slate-900
+                                         border border-slate-300 px-3 py-1 rounded-md
+                                         hover:bg-slate-100 transition"
+                            >
+                              Edit
+                            </button>
+                          )}
                           {hasVersions ? (
                             <span className="text-xs text-slate-400">Has versions</span>
-                          ) : (
+                          ) : canDelete ? (
                             <button
                               onClick={() => handleDelete(d)}
                               disabled={isDeleting}
@@ -331,7 +337,7 @@ export default function DocumentsPage({ projectId, onSelectDocument }: Documents
                             >
                               {isDeleting ? "Deleting..." : "Delete"}
                             </button>
-                          )}
+                          ) : null}
                         </div>
                       </td>
                     </>

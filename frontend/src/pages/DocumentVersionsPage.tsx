@@ -4,9 +4,11 @@ import type { DocumentVersion } from "../types/documentVersion";
 
 type DocumentVersionsPageProps = {
   documentId: number;
+  role?: string;
 };
 
-export default function DocumentVersionsPage({ documentId }: DocumentVersionsPageProps) {
+export default function DocumentVersionsPage({ documentId, role = "VIEWER" }: DocumentVersionsPageProps) {
+  const canUpload = role !== "VIEWER";
   const [versions, setVersions] = useState<DocumentVersion[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -83,7 +85,7 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
           <h2 className="text-2xl font-semibold text-slate-800">Document Versions</h2>
           <p className="text-sm text-slate-500">Document ID: {documentId}</p>
         </div>
-        {!showUpload && (
+        {canUpload && !showUpload && (
           <button
             onClick={() => { setShowUpload(true); setError(""); }}
             className="text-sm font-medium text-white bg-slate-800 hover:bg-slate-700
@@ -96,7 +98,7 @@ export default function DocumentVersionsPage({ documentId }: DocumentVersionsPag
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-      {showUpload && (
+      {canUpload && showUpload && (
         <form
           onSubmit={handleUpload}
           className="mb-4 border border-slate-200 rounded-lg bg-white px-4 py-4 space-y-3"
