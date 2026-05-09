@@ -32,6 +32,9 @@ class Company(models.Model):
 class Project(models.Model):
     STATUS_CHOICES = [
         ("ACTIVE", "Active"),
+        ("ON_HOLD", "On Hold"),
+        ("COMPLETED", "Completed"),
+        ("CANCELLED", "Cancelled"),
         ("CLOSED", "Closed"),
     ]
 

@@ -25,11 +25,14 @@ const emptyForm = (): FormState => ({
   end_date: "",
 });
 
-const STATUS_OPTIONS = ["ACTIVE", "CLOSED"] as const;
+const STATUS_OPTIONS = ["ACTIVE", "ON_HOLD", "COMPLETED", "CANCELLED", "CLOSED"] as const;
 
 const statusStyle: Record<string, string> = {
-  ACTIVE: "bg-emerald-100 text-emerald-700",
-  CLOSED: "bg-slate-200 text-slate-600",
+  ACTIVE:    "bg-emerald-100 text-emerald-700",
+  ON_HOLD:   "bg-amber-100 text-amber-700",
+  COMPLETED: "bg-blue-100 text-blue-700",
+  CANCELLED: "bg-red-100 text-red-500",
+  CLOSED:    "bg-slate-200 text-slate-600",
 };
 
 export default function ProjectsPage({ companyId, onSelectProject }: ProjectsPageProps) {

@@ -5,7 +5,7 @@ export interface Project {
   code: string;
   name: string;
   description: string;
-  status: "ACTIVE" | "CLOSED";
+  status: "ACTIVE" | "ON_HOLD" | "COMPLETED" | "CANCELLED" | "CLOSED";
   start_date: string | null;
   end_date: string | null;
   created_at: string;
