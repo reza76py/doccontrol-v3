@@ -1,9 +1,19 @@
 
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 import os
 
 User = get_user_model()
+
+
+def validate_document_file(file):
+    allowed_extensions = {".pdf", ".dwg", ".docx"}
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext not in allowed_extensions:
+        raise ValidationError(f"Unsupported file type '{ext}'. Allowed: {', '.join(sorted(allowed_extensions))}")
+    if file.size > 50 * 1024 * 1024:
+        raise ValidationError("File size must not exceed 50 MB.")
 
 
 def document_upload_path(instance, filename):
@@ -130,7 +140,7 @@ class Document(models.Model):
 class DocumentVersion(models.Model):
     document = models.ForeignKey(Document, on_delete=models.PROTECT, related_name="versions")
     version_number = models.PositiveIntegerField()
-    file = models.FileField(upload_to=document_upload_path)
+    file = models.FileField(upload_to=document_upload_path, validators=[validate_document_file])
     change_note = models.TextField(blank=True)
     uploaded_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="uploaded_versions")
     uploaded_at = models.DateTimeField(auto_now_add=True)
