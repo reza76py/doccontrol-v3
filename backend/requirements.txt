@@ -8,3 +8,5 @@ sqlparse==0.5.5
 tzdata==2025.3
 django-extensions==4.1 
 gunicorn==22.0.0
+python-dotenv==1.2.2
+mysqlclient>=2.2

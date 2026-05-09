@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(python -m py_compile /d/projects/myProjects/doccontrol-v3/backend/core/views.py)",
+      "Bash(python -m py_compile /d/projects/myProjects/doccontrol-v3/backend/core/serializers.py)",
+      "Bash(python -m py_compile /d/projects/myProjects/doccontrol-v3/backend/core/urls.py)",
+      "Bash(python -m py_compile /d/projects/myProjects/doccontrol-v3/backend/config/urls.py)",
+      "Bash(python -m py_compile /d/projects/myProjects/doccontrol-v3/backend/config/settings.py)",
+      "Bash(python -c ' *)",
+      "Bash(venv/Scripts/pip install *)"
+    ]
+  }
+}

@@ -1,16 +1,54 @@
 services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
-    container_name: doccontrol-v3-backend
-    env_file:
-      - ./backend/.env
-    ports:
-      - "127.0.0.1:8000:8000"
-    volumes:
-      - backend_media:/app/media
     restart: unless-stopped
+    env_file: ./.env
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+    volumes:
+      - backend_static:/app/staticfiles
+      - backend_media:/app/media
+    expose:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "manage.py", "check"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
+  mysql_prod_data:
+  backend_static:
   backend_media:
