@@ -2,7 +2,7 @@ export interface AuditLog {
   id: number;
   entity_type: "COMPANY" | "PROJECT" | "DOCUMENT" | "VERSION";
   entity_id: number;
-  action: "CREATE" | "UPDATE" | "ISSUE" | "CANCEL";
+  action: "CREATE" | "UPDATE" | "ISSUE" | "CANCEL" | "DELETE";
   old_value: unknown | null;
   new_value: unknown | null;
   performed_by: number;

@@ -14,3 +14,22 @@ export const getDocuments = async (
 export const deleteDocument = async (id: number) => {
   await api.delete(`/documents/${id}/`);
 };
+
+type DocumentPayload = {
+  project: number;
+  document_number: string;
+  title: string;
+  discipline: string;
+  doc_type: string;
+  status: string;
+};
+
+export const createDocument = async (data: DocumentPayload): Promise<Document> => {
+  const res = await api.post("/documents/", data);
+  return res.data;
+};
+
+export const updateDocument = async (id: number, data: Partial<DocumentPayload>): Promise<Document> => {
+  const res = await api.put(`/documents/${id}/`, data);
+  return res.data;
+};

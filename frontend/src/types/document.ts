@@ -10,4 +10,10 @@ export interface Document {
   created_by_username: string;
   created_at: string;
   versions_count: number;
+  latest_version: {
+    id: number;
+    version_number: number;
+    file: string | null;
+    uploaded_at: string;
+  } | null;
 }

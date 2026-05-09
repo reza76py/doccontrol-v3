@@ -35,6 +35,7 @@ function MainApp() {
   const [page, setPage] = useState<Page>("companies");
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const logout = () => {
@@ -115,7 +116,7 @@ function MainApp() {
 
         {/* Mobile dropdown */}
         {mobileNavOpen && (
-          <div className="md:hidden bg-slate-900 border-t border-slate-800 px-4 py-3 flex flex-col gap-3">
+          <div className="md:hidden z-50 bg-slate-900 border-t border-slate-800 px-4 py-3 flex flex-col gap-3">
             {navItems.map(([key, label]) => (
               <button
                 key={key}
@@ -165,10 +166,18 @@ function MainApp() {
         )}
 
         {page === "documents" && (
-          <DocumentsPage projectId={selectedProjectId ?? undefined} />
+          <DocumentsPage
+            projectId={selectedProjectId ?? undefined}
+            onSelectDocument={(id) => {
+              setSelectedDocumentId(id);
+              setPage("versions");
+            }}
+          />
         )}
 
-        {page === "versions" && <DocumentVersionsPage />}
+        {page === "versions" && selectedDocumentId !== null && (
+          <DocumentVersionsPage documentId={selectedDocumentId} />
+        )}
         {page === "auditLogs" && <AuditLogsPage />}
       </main>
     </div>

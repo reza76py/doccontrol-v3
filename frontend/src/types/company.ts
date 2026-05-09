@@ -1,5 +1,5 @@
 export interface Company {
     id: number;
     name: string;
-    createdAt: string;
+    created_at: string;
 }
