@@ -208,7 +208,7 @@ export default function DocumentsPage({ projectId, onSelectDocument, role = "VIE
       )}
 
       {loading ? (
-        <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white animate-pulse">
+        <div className="w-full min-w-0 overflow-x-auto border border-slate-200 rounded-lg bg-white animate-pulse">
           <table className="min-w-full text-sm">
             <thead className="bg-slate-100 text-slate-600">
               <tr>
@@ -237,7 +237,7 @@ export default function DocumentsPage({ projectId, onSelectDocument, role = "VIE
           </table>
         </div>
       ) : (
-      <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
+      <div className="w-full min-w-0 overflow-x-auto border border-slate-200 rounded-lg bg-white">
         <table className="min-w-full text-sm">
           <thead className="bg-slate-100 text-slate-600">
             <tr>

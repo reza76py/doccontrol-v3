@@ -251,7 +251,7 @@ export default function ProjectsPage({ companyId, onSelectProject, role = "VIEWE
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 ml-4 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 ml-4">
                     <span
                       className={`text-xs font-medium px-2 py-1 rounded-full
                         ${statusStyle[p.status] ?? "bg-slate-100 text-slate-500"}`}
@@ -348,7 +348,7 @@ function ProjectFormFields({
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-xs text-slate-500 mb-1">Start date</label>
           <input type="date" value={form.start_date} onChange={set("start_date")} className={inputCls} />

@@ -178,7 +178,7 @@ export default function CompaniesPage({ onSelectCompany, role }: CompaniesPagePr
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Escape") cancelEdit(); }}
-                    className="flex-1 text-sm border border-slate-300 rounded-md px-3 py-1.5
+                    className="flex-1 min-w-0 text-sm border border-slate-300 rounded-md px-3 py-1.5
                                focus:outline-none focus:ring-2 focus:ring-slate-400"
                   />
                   <button
@@ -202,7 +202,7 @@ export default function CompaniesPage({ onSelectCompany, role }: CompaniesPagePr
               )}
 
               {!isEditing && (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => onSelectCompany(c.id)}
                     className="text-sm font-medium text-slate-700 hover:text-slate-900
