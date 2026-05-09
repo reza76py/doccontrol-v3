@@ -71,6 +71,26 @@ class Document(models.Model):
         ("SUPERSEDED", "Superseded"),
         ("CANCELLED", "Cancelled"),
     ]
+    DISCIPLINE_CHOICES = [
+        ("STRUCTURAL", "Structural"),
+        ("CIVIL", "Civil"),
+        ("ARCHITECTURAL", "Architectural"),
+        ("MECHANICAL", "Mechanical"),
+        ("ELECTRICAL", "Electrical"),
+        ("GEOTECHNICAL", "Geotechnical"),
+        ("SURVEY", "Survey"),
+        ("ENVIRONMENTAL", "Environmental"),
+    ]
+    DOC_TYPE_CHOICES = [
+        ("DRAWING", "Drawing"),
+        ("SPECIFICATION", "Specification"),
+        ("REPORT", "Report"),
+        ("CALCULATION", "Calculation"),
+        ("METHOD_STATEMENT", "Method Statement"),
+        ("INSPECTION", "Inspection"),
+        ("TRANSMITTAL", "Transmittal"),
+        ("CORRESPONDENCE", "Correspondence"),
+    ]
 
     project = models.ForeignKey(
         Project,
@@ -79,8 +99,8 @@ class Document(models.Model):
     )
     document_number = models.CharField(max_length=100)
     title = models.CharField(max_length=255)
-    discipline = models.CharField(max_length=50)
-    doc_type = models.CharField(max_length=50)
+    discipline = models.CharField(max_length=20, choices=DISCIPLINE_CHOICES)
+    doc_type = models.CharField(max_length=20, choices=DOC_TYPE_CHOICES)
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,

@@ -24,6 +24,8 @@ const emptyForm = (): FormState => ({
 });
 
 const STATUS_OPTIONS = ["DRAFT", "REVIEW", "IFC", "SUPERSEDED", "CANCELLED"] as const;
+const DISCIPLINE_OPTIONS = ["STRUCTURAL", "CIVIL", "ARCHITECTURAL", "MECHANICAL", "ELECTRICAL", "GEOTECHNICAL", "SURVEY", "ENVIRONMENTAL"] as const;
+const DOC_TYPE_OPTIONS = ["DRAWING", "SPECIFICATION", "REPORT", "CALCULATION", "METHOD_STATEMENT", "INSPECTION", "TRANSMITTAL", "CORRESPONDENCE"] as const;
 
 const statusStyle: Record<string, string> = {
   DRAFT: "bg-slate-200 text-slate-700",
@@ -336,11 +338,21 @@ function DocumentFormFields({
       </div>
       <div>
         <label className="block text-xs text-slate-500 mb-1">Discipline</label>
-        <input type="text" value={form.discipline} onChange={set("discipline")} className={inputCls} />
+        <select value={form.discipline} onChange={set("discipline")} className={inputCls}>
+          <option value="">— Select —</option>
+          {DISCIPLINE_OPTIONS.map((d) => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+        </select>
       </div>
       <div>
         <label className="block text-xs text-slate-500 mb-1">Type</label>
-        <input type="text" value={form.doc_type} onChange={set("doc_type")} className={inputCls} />
+        <select value={form.doc_type} onChange={set("doc_type")} className={inputCls}>
+          <option value="">— Select —</option>
+          {DOC_TYPE_OPTIONS.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
       </div>
       <div>
         <label className="block text-xs text-slate-500 mb-1">Status</label>
