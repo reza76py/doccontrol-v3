@@ -76,7 +76,7 @@ function MainApp() {
             <img
               src={logo}
               alt="RezTeche Logo"
-              className="h-28 w-auto object-contain transition-all duration-200"
+              className="h-8 w-auto object-contain transition-all duration-200"
             />
           </a>
 

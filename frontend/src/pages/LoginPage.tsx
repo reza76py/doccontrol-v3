@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authApi } from "../lib/api";
+import logo from "../assets/rezteche-logo.png";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -27,7 +28,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a1a]">
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#0a0a1a]">
+
+      {/* Corner logo */}
+      <a
+        href="https://rezteche.com"
+        target="_blank"
+        rel="noreferrer"
+        className="absolute top-4 left-4"
+      >
+        <img src={logo} alt="RezTeche" className="h-8 w-auto" />
+      </a>
+
+      {/* Learn link */}
+      <a
+        href="https://rezteche.com/apps/document-control"
+        target="_blank"
+        rel="noreferrer"
+        className="mb-4 text-sm text-slate-400 hover:text-[#6c63ff] transition"
+      >
+        Learn how to use this app →
+      </a>
+
       <div className="w-full max-w-sm bg-[#12122a] border border-[#1e1e3a] rounded-xl p-8">
         <h1 className="text-2xl font-bold text-white mb-1 text-center">Sign In</h1>
         <p className="text-sm text-slate-400 text-center mb-6">Welcome back to DocControl</p>
