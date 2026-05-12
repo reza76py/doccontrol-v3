@@ -37,7 +37,7 @@ export default function LoginPage() {
         rel="noreferrer"
         className="absolute top-4 left-4"
       >
-        <img src={logo} alt="RezTeche" className="h-8 w-auto" />
+        <img src={logo} alt="RezTeche" className="h-20 w-auto" />
       </a>
 
       {/* Learn link */}
